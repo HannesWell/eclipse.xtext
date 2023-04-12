@@ -43,6 +43,6 @@ jobs:
       - name: Build and test
         uses: coactions/setup-xvfb@v1
         with:
-          run: mvn clean verify --show-version -PuseJenkinsSnapshots -Dsurefire.rerunFailingTestsCount=3
+          run: mvn clean verify -PuseJenkinsSnapshots
           working-directory: org.eclipse.xtext.full.releng
         if: ${{ env.BASE_REPO != env.PR_HEAD_REPO }}

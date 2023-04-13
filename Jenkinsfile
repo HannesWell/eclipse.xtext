@@ -28,7 +28,7 @@ pipeline {
 
   tools {
      maven "apache-maven-3.8.6"
-     jdk "${params.JDK_VERSION}"
+     jdk "temurin-jdk17-latest"
   }
 
   stages {
@@ -59,10 +59,15 @@ pipeline {
     stage('Maven/Tycho Build & Test') {
       environment {
         MAVEN_OPTS = "-Xmx1500m"
+        JAVA_HOME_11_X64 = tool(type:'jdk', name:'temurin-jdk11-latest')
+        JAVA_HOME_17_X64 = tool(type:'jdk', name:'temurin-jdk17-latest')
       }
       steps {
         xvnc(useXauthority: true) {
-          sh "./full-build.sh --tp=${selectedTargetPlatform()} ${javaVersionBasedProperties()}"
+          sh """
+            ./full-build.sh --tp=${selectedTargetPlatform()} \
+              ${javaVersion() == 17 ? '' : '--toolchains releng/toolchains.xml -Pstrict-release-jdk'}
+          """
         }
       }// END steps
     } // END stage
@@ -161,20 +166,3 @@ def selectedTargetPlatform() {
         return tp
     }
 }
-
-/**
- * Tycho 3 requires Java 17.
- * If the build uses Java version 11, we return the proper tycho-version override.
- * Otherwise, we return an empty string.
- */
-def javaVersionBasedProperties() {
-    def javaVersion = javaVersion()
-
-    if (javaVersion<17) {
-        println("Switching to Tycho 2.7.5 with Java ${javaVersion}")
-        return '-Dtycho-version=2.7.5'
-    } else {
-        return ''
-    }
-}
-

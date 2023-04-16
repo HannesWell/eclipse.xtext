@@ -4,9 +4,21 @@ on:
   push:
     paths-ignore:
       - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+env:
+  # Base for the PR
+  BASE_REPO: ${{ github.event.pull_request.base.repo.clone_url }}
+
+  # Repository of PR
+  PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.clone_url }}
+
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.base.repo.clone_url != github.event.pull_request.head.repo.clone_url
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest' ] # 'windows-latest' too flaky

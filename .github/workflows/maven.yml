@@ -64,3 +64,4 @@ jobs:
       - name: Build Maven artifacts
         run: mvn clean verify -PuseJenkinsSnapshots
         working-directory: org.eclipse.xtext.maven.releng
+# Some change
